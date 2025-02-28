@@ -1,43 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import io from 'socket.io-client';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import IconLibrary from '../components/IconLibrary';
+import SentenceBar from '../components/SentenceBar';
+import Chat from '../components/Chat';
 
-const socket = io('http://localhost:4000');
+type Icon = {
+  id: string;
+  name: string;
+  imageUrl: string;
+};
 
-const Chat = () => {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<string[]>([]);
+const Home = () => {
+  const router = useRouter();
+  const [selectedIcons, setSelectedIcons] = useState<Icon[]>([]);
 
-  useEffect(() => {
-    socket.on('receiveMessage', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    return () => {
-      socket.off('receiveMessage');
-    };
-  }, []);
-
-  const sendMessage = () => {
-    socket.emit('sendMessage', message);
-    setMessage('');
+  const handleSelectIcon = (icon: Icon) => {
+    setSelectedIcons((prevIcons) => [...prevIcons, icon]);
   };
 
   return (
-    <View>
-      <FlatList
-        data={messages}
-        renderItem={({ item }) => <Text>{item}</Text>}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      <TextInput
-        value={message}
-        onChangeText={setMessage}
-        placeholder="Type a message"
-      />
-      <Button title="Send" onPress={sendMessage} />
+    <View style={styles.container}>
+      <Text style={styles.title}>Home Page</Text>
+      <View style={styles.buttonContainer}>
+        <Button title="Go to Profile" onPress={() => router.push('/pages/Profile')} color="#ff69b4" />
+        <Button title="Go to Settings" onPress={() => router.push('/pages/Settings')} color="#ff69b4" />
+      </View>
+      <IconLibrary onSelectIcon={handleSelectIcon} />
+      <SentenceBar selectedIcons={selectedIcons} />
+      <Chat />
     </View>
   );
 };
 
-export default Chat;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f8ff',
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#ff69b4',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 20,
+  },
+});
+
+export default Home;
