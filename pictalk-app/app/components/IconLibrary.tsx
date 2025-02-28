@@ -40,6 +40,8 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     backgroundColor: '#f0f8ff',
+    borderRadius: 10,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,

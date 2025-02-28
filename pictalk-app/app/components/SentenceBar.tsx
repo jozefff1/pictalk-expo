@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import Draggable from 'react-native-draggable';
 
 interface Icon {
   id: string;
@@ -9,19 +10,27 @@ interface Icon {
 
 interface SentenceBarProps {
   selectedIcons: Icon[];
+  onRemoveIcon: (icon: Icon) => void;
 }
 
-const SentenceBar: React.FC<SentenceBarProps> = ({ selectedIcons }) => {
+const SentenceBar: React.FC<SentenceBarProps> = ({ selectedIcons, onRemoveIcon }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sentence Bar</Text>
       <FlatList
         data={selectedIcons}
         renderItem={({ item }) => (
-          <View style={styles.iconContainer}>
-            <Image source={{ uri: item.imageUrl }} style={styles.iconImage} />
-            <Text style={styles.iconText}>{item.name}</Text>
-          </View>
+          <Draggable
+            onDragRelease={() => onRemoveIcon(item)}
+            renderSize={80}
+            x={0}
+            y={0}
+          >
+            <TouchableOpacity onPress={() => onRemoveIcon(item)} style={styles.iconContainer}>
+              <Image source={{ uri: item.imageUrl }} style={styles.iconImage} />
+              <Text style={styles.iconText}>{item.name}</Text>
+            </TouchableOpacity>
+          </Draggable>
         )}
         keyExtractor={(item) => item.id}
         horizontal
